@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-4.0.xsd
+       ">
+
+    <http auto-config="true" use-expressions="true">
+
+        <intercept-url pattern="/user" access="isAuthenticated()"/>
+        <intercept-url pattern="/admin" access="isAuthenticated()"/>
+        <!--<intercept-url pattern="/app/login" access="permitAll" />-->
+        <!--<intercept-url pattern="/app/login.jsp" access="permitAll" />-->
+        <!--<intercept-url pattern="/app/registration" access="permitAll" />-->
+        <!--<intercept-url pattern="/app/registration.jsp" access="permitAll" />-->
+        <!--<intercept-url pattern="/app/registration-success.jsp" access="permitAll" />-->
+
+        <form-login
+                login-page="/login"
+                login-processing-url="/login"
+                default-target-url="/"
+                always-use-default-target = "true"
+                authentication-failure-url="/login?error=true"
+                username-parameter="username"
+                password-parameter="password"/>
+
+        <logout
+                logout-success-url="/"
+                logout-url="/logout"/>
+
+        <remember-me user-service-ref="userDetailsServiceImpl" key="uniqueAndSecret"/>
+
+        <csrf disabled="true"/>
+
+    </http>
+
+    <authentication-manager>
+        <authentication-provider user-service-ref="userDetailsServiceImpl">
+            <password-encoder ref="passwordHelper"/>
+        </authentication-provider>
+    </authentication-manager>
+
+</beans:beans>
