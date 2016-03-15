@@ -34,7 +34,7 @@ public class MainController {
             model.addAttribute("username", "Guest");
         }
 
-        return "main";
+        return "home";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)

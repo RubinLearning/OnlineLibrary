@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.util.*;
 
 @Entity
-@Table(name="USERS")
+@Table(name="USER")
 public class User implements UserDetails {
 
     @Id
@@ -22,7 +22,10 @@ public class User implements UserDetails {
     @Column(name = "PASSWORD")
     private String password;
 
-    @JoinTable(name = "USER_ROLES", joinColumns = @JoinColumn(name = "USER_ID"))
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "USER_BOOK", joinColumns=@JoinColumn(name="BOOK_ID"), inverseJoinColumns=@JoinColumn(name="USER_ID"))
+    private List<Book> books;
+
     @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role userRole;

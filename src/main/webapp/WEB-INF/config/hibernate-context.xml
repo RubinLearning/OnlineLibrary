@@ -9,7 +9,7 @@
 			http://www.springframework.org/schema/tx/spring-tx.xsd
 	   		">
 
-    <!-- Enable annotation style of managing transactions -->
+    <!-- Enable annotation style of managing books -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
