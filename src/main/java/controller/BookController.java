@@ -34,7 +34,7 @@ public class BookController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Book> books = bookService.getAll();
         model.addAttribute("username", user.getUsername());
-        model.addAttribute("books",books);
+        model.addAttribute("books", books);
         return "book-list";
     }
 

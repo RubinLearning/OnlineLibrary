@@ -10,27 +10,22 @@
 </head>
 <body>
 
+<c:url var="homeUrl" value="/" />
 <c:url var="editImgUrl" value="/resources/img/edit.png" />
 <c:url var="deleteImgUrl" value="/resources/img/delete.png" />
-<c:url var="addUrl" value="add" />
-<c:url var="settingsUrl" value="/app/settings" />
-<c:url var="reportUrl" value="/app/report"/>
-<c:url var="logoutUrl" value="/app/logout"/>
-<c:url var="helpUrl" value="/app/help"/>
+<c:url var="addUrl" value="/book/add" />
+<c:url var="logoutUrl" value="/logout"/>
 
 <table style="width: 100%">
 
 <tr>
 <td style="text-align:left">
-<h3><a href="${reportUrl}">Reports</a></h3>
-<h1>Accounts</h1>
-<p><a href="${settingsUrl}">Settings</a></p>
+<h1>Books</h1>
+<p><a href="${homeUrl}">Go back to home page</a></p>
 </td>
 <td style="text-align:right; vertical-align:top">
 Logged as <b>${username}</b>
 <p><a href="${logoutUrl}">Logout</a></p>
-<p>...</p>
-<p>(<a href="${helpUrl}">help</a>)</p>
 </td>
 </tr>
 

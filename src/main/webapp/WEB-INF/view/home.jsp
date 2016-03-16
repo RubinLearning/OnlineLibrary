@@ -14,6 +14,7 @@
 <c:url var="loginUrl" value="/login"/>
 <c:url var="registrationUrl" value="/registration"/>
 <c:url var="logoutUrl" value="/logout"/>
+<c:url var="bookListUrl" value="/book/list"/>
 
 <p>You are logged as <b>${username}</b></p>
 <p><a href="${loginUrl}">Login</a> or <a href="${registrationUrl}">Register new user</a></p>
@@ -22,6 +23,8 @@
 <h1>Favorites</h1>
 
 <p>To create your own book list, you have to log in first</p>
+
+<p><a href="${bookListUrl}">Search for book</a></p>
 
 <table style="width: 100%" border="1">
     <tr>
