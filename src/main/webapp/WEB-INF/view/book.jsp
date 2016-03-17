@@ -12,7 +12,8 @@
 <body>
 
 <c:url var="addToFavoritesUrl" value="/favorites/add?id=${book.id}" />
-<c:url var="uploadUrl" value="/book/upload" />
+<c:url var="downloadUrl" value="/book/content/download?id=${book.id}" />
+<c:url var="readUrl" value="/book/content/read?id=${book.id}" />
 
 <c:choose>
     <c:when test="${type=='edit'}">
@@ -25,13 +26,13 @@
     </c:when>
 </c:choose>
 
-<form:form modelAttribute="book" method="POST" action="${saveUrl}">
+<form:form modelAttribute="book" method="POST" action="${saveUrl}" enctype="multipart/form-data">
 
 	<table>
 
 		<tr>
-			<td><form:label path="name">Name:</form:label></td>
-			<td><form:input path="name"/></td>
+			<td><form:label path="title">Title:</form:label></td>
+			<td><form:input path="title"/></td>
 		</tr>
 
 		<tr>
@@ -59,6 +60,10 @@
 		</tr>
 
 	</table>
+
+	<br/>
+	Upload pdf: <input type="file" name="file" accept=".pdf"><br/>
+	<br/>
 	
 	<input type="submit" value="Save" />
 
@@ -66,13 +71,10 @@
 
 <p><a href="${addToFavoritesUrl}">Add to Favorites</a></p>
 
-<h3>File Upload:</h3>
-Select a file to upload: <br />
-<form method="POST" action="${uploadUrl}" enctype="multipart/form-data">
-	File to upload: <input type="file" name="file"><br />
-	Name: <input type="text" name="name"><br /> <br />
-	<input type="submit" value="Upload"> Press here to upload the file!
-</form>
+<c:if test="${contentAvailable==true}">
+	<p><a href="${downloadUrl}">Download</a></p>
+	<p><a href="${readUrl}">Read</a></p>
+</c:if>
 
 </body>
 </html>

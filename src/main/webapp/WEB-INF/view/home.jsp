@@ -30,7 +30,7 @@
 <table style="border: 1px solid; width: 100%; text-align:center">
     <thead style="background:#d3dce3">
     <tr>
-        <td>Name</td>
+        <td>Title</td>
         <td>Author</td>
         <td>Genre</td>
         <td>Year</td>
@@ -42,7 +42,7 @@
         <c:url var="deleteUrl" value="/favorites/delete?id=${book.id}" />
         <c:url var="editUrl" value="/book/edit?id=${book.id}" />
         <tr>
-            <td><a href="${editUrl}"><c:out value="${book.name}"/></a></td>
+            <td><a href="${editUrl}"><c:out value="${book.title}"/></a></td>
             <td><c:out value="${book.author}" /></td>
             <td><c:out value="${book.genre.name}" /></td>
             <td><c:out value="${book.year}" /></td>

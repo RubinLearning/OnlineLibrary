@@ -11,8 +11,8 @@ public class Book {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name="NAME")
-    private String name;
+    @Column(name="TITLE")
+    private String title;
 
     @Column(name="DESCRIPTION", length = 2000)
     private String description;
@@ -35,12 +35,12 @@ public class Book {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
     public String getDescription() {

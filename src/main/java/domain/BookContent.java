@@ -15,7 +15,8 @@ public class BookContent {
     @JoinColumn(name = "BOOK_ID")
     private Book book;
 
-    @Column(name = "CONTENT")
+    @Column(name = "CONTENT", length = 6000000)
+    @Lob
     private byte[] content;
 
     public Long getId() {

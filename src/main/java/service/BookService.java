@@ -66,11 +66,20 @@ public class BookService {
         session.merge(user);
     }
 
-    public List<Book> getAllByGenre(Genre genre) {
-        logger.debug("Retrieving books by genre");
+    public List<Book> getAllByGenreId(Long genreId) {
+        logger.debug("Retrieving books by genre id");
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("SELECT b FROM Book as b WHERE b.genre = :genre");
-        query.setParameter("genre", genre);
+        Query query = session.createQuery("SELECT b FROM Book as b WHERE b.genre.id = :genreId");
+        query.setParameter("genreId", genreId);
+        return query.list();
+    }
+
+    // case insensitive search in Author's name or Book's title
+    public List<Book> getBySearchString(String searchString) {
+        logger.debug("Retrieving books by search string");
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("SELECT b FROM Book as b WHERE upper(b.title) like :searchString or upper(b.author) like :searchString");
+        query.setParameter("searchString", "%" + searchString.toUpperCase() + "%");
         return query.list();
     }
 
@@ -97,5 +106,18 @@ public class BookService {
         logger.debug("Editing existing book");
         Session session = sessionFactory.getCurrentSession();
         session.merge(book);
+    }
+
+    public BookContent getContentByBookId(Long bookId){
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("SELECT bc FROM BookContent as bc WHERE bc.book.id = :bookId");
+        query.setParameter("bookId", bookId);
+        return (BookContent) query.uniqueResult();
+    }
+
+    public void updateContent(BookContent bookContent) {
+        logger.debug("Updating content");
+        Session session = sessionFactory.getCurrentSession();
+        session.merge(bookContent);
     }
 }
