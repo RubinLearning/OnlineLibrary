@@ -31,13 +31,39 @@ public class BookService {
         return query.list();
     }
 
-    //!!!! need to upgrade
     public List<Book> getAllByUser(User user) {
         logger.debug("Retrieving books by user");
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("SELECT b FROM Book as b");
-//        query.setParameter("user", user);
-        return query.list();
+        return ((User) session.get(User.class, user.getId())).getBooks();
+    }
+
+    public void addToFavorites(User user, Long bookId) {
+        logger.debug("Adding book to favorites");
+        Session session = sessionFactory.getCurrentSession();
+        List<Book> books = user.getBooks();
+        boolean alreadyIsFavorite = false;
+        for (Book book: books) {
+            if (book.getId() == bookId) {
+                alreadyIsFavorite = true;
+                break;
+            }
+        }
+        if (!alreadyIsFavorite) {
+            books.add((Book) session.get(Book.class, bookId));
+            session.merge(user);
+        }
+    }
+
+    public void deleteFromFavorites(User user, Long bookId) {
+        logger.debug("Deleting book from favorites");
+        Session session = sessionFactory.getCurrentSession();
+        Iterator<Book> iterator = user.getBooks().iterator();
+        while (iterator.hasNext()){
+            if (iterator.next().getId() == bookId) {
+                iterator.remove();
+            }
+        }
+        session.merge(user);
     }
 
     public List<Book> getAllByGenre(Genre genre) {
@@ -70,12 +96,6 @@ public class BookService {
     public void edit(Book book) {
         logger.debug("Editing existing book");
         Session session = sessionFactory.getCurrentSession();
-        Book existingBook = (Book) session.get(Book.class, book.getId());
-        existingBook.setName(book.getName());
-        existingBook.setAuthor(book.getAuthor());
-        existingBook.setName(book.getName());
-        existingBook.setDescription(book.getDescription());
-        existingBook.setGenre(book.getGenre());
-        session.save(existingBook);
+        session.merge(book);
     }
 }

@@ -22,7 +22,7 @@ public class User implements UserDetails {
     @Column(name = "PASSWORD")
     private String password;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "USER_BOOK", joinColumns=@JoinColumn(name="BOOK_ID"), inverseJoinColumns=@JoinColumn(name="USER_ID"))
     private List<Book> books;
 
@@ -55,6 +55,14 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
     }
 
     public Role getUserRole() {

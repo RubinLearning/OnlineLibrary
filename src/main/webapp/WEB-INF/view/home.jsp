@@ -15,6 +15,7 @@
 <c:url var="registrationUrl" value="/registration"/>
 <c:url var="logoutUrl" value="/logout"/>
 <c:url var="bookListUrl" value="/book/list"/>
+<c:url var="deleteImgUrl" value="/resources/img/delete.png" />
 
 <p>You are logged as <b>${username}</b></p>
 <p><a href="${loginUrl}">Login</a> or <a href="${registrationUrl}">Register new user</a></p>
@@ -26,22 +27,34 @@
 
 <p><a href="${bookListUrl}">Search for book</a></p>
 
-<table style="width: 100%" border="1">
+<table style="border: 1px solid; width: 100%; text-align:center">
+    <thead style="background:#d3dce3">
     <tr>
-        <td>№</td>
         <td>Name</td>
         <td>Author</td>
         <td>Genre</td>
         <td>Year</td>
+        <th></th>
     </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-    </tr>
+    </thead>
+    <tbody style="background:#ccc">
+    <c:forEach items="${userBooks}" var="book">
+        <c:url var="deleteUrl" value="/favorites/delete?id=${book.id}" />
+        <c:url var="editUrl" value="/book/edit?id=${book.id}" />
+        <tr>
+            <td><a href="${editUrl}"><c:out value="${book.name}"/></a></td>
+            <td><c:out value="${book.author}" /></td>
+            <td><c:out value="${book.genre.name}" /></td>
+            <td><c:out value="${book.year}" /></td>
+            <td style = "width: 40px"><a href="${deleteUrl}"><img src="${deleteImgUrl}"/></a></td>
+        </tr>
+    </c:forEach>
+    </tbody>
 </table>
+
+<c:if test="${empty userBooks}">
+    No books available.
+</c:if>
 
 </body>
 

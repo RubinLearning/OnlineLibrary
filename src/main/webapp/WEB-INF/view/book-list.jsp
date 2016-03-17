@@ -6,12 +6,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Cash manager</title>
+<title>Library</title>
 </head>
 <body>
 
 <c:url var="homeUrl" value="/" />
-<c:url var="editImgUrl" value="/resources/img/edit.png" />
 <c:url var="deleteImgUrl" value="/resources/img/delete.png" />
 <c:url var="addUrl" value="/book/add" />
 <c:url var="logoutUrl" value="/logout"/>
@@ -36,32 +35,30 @@ Logged as <b>${username}</b>
 	<thead style="background:#d3dce3">
 		<tr>
 			<th>Name</th>
-			<th>Amount</th>
-            <th>Currency</th>
-			<th colspan="2"></th>
+			<th>Author</th>
+            <th>Year</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody style="background:#ccc">
-	<c:forEach items="${accountsWithAmount}" var="accountWithAmount">
-		<c:url var="editUrl" value="/app/account/edit?id=${accountWithAmount[0].id}" />
-		<c:url var="deleteUrl" value="/app/account/delete?id=${accountWithAmount[0].id}" />
-		<c:url var="transactionUrl" value="/app/transaction/list?id=${accountWithAmount[0].id}" />
+	<c:forEach items="${books}" var="book">
+		<c:url var="deleteUrl" value="/book/delete?id=${book.id}" />
+		<c:url var="editUrl" value="/book/edit?id=${book.id}" />
 		<tr>
-			<td><a href="${transactionUrl}"><c:out value="${accountWithAmount[0].name}" /></a></td>
-			<td><c:out value="${accountWithAmount[1]}" /></td>
-			<td><c:out value="${accountWithAmount[0].currency.name}" /></td>
-			<td style = "width: 40px"><a href="${editUrl}"><img src="${editImgUrl}"></img></a></td>
-			<td style = "width: 40px"><a href="${deleteUrl}"><img src="${deleteImgUrl}"></img></a></td>
+			<td><a href="${editUrl}"><c:out value="${book.name}"/></a></td>
+			<td><c:out value="${book.author}" /></td>
+			<td><c:out value="${book.year}" /></td>
+			<td style = "width: 40px"><a href="${deleteUrl}"><img src="${deleteImgUrl}"/></a></td>
 		</tr>
 	</c:forEach>
 	</tbody>
 </table>
 
-<c:if test="${empty accountsWithAmount}">
-	No records found. 
+<c:if test="${empty books}">
+	No books available.
 </c:if>
 
-<p><a href="${addUrl}">Create new account</a></p>
+<p><a href="${addUrl}">Add new book</a></p>
 
 </td>
 </tr>

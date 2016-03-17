@@ -14,7 +14,7 @@ public class Book {
     @Column(name="NAME")
     private String name;
 
-    @Column(name="DESCRIPTION")
+    @Column(name="DESCRIPTION", length = 2000)
     private String description;
 
     @Column(name="YEAR")
