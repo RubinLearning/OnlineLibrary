@@ -31,14 +31,14 @@
                 logout-success-url="/"
                 logout-url="/logout"/>
 
-        <remember-me user-service-ref="userDetailsServiceImpl" key="uniqueAndSecret"/>
+        <remember-me user-service-ref="userDetailsServiceHibernateImpl" key="uniqueAndSecret"/>
 
         <csrf disabled="true"/>
 
     </http>
 
     <authentication-manager>
-        <authentication-provider user-service-ref="userDetailsServiceImpl">
+        <authentication-provider user-service-ref="userDetailsServiceHibernateImpl">
             <password-encoder ref="passwordHelper"/>
         </authentication-provider>
     </authentication-manager>

@@ -3,7 +3,7 @@ package utils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service("passwordHelper")
+@Service
 public class PasswordHelper implements PasswordEncoder {
 
     public PasswordHelper() {

@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="BOOK")
-public class Book {
+public class Book implements Comparable<Book>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,5 +73,46 @@ public class Book {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    // to be able to do simple check whether the book is favorite
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Book book = (Book) o;
+
+        return !(id != null ? !id.equals(book.id) : book.id != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
+    // to be able to sort books in favorites list
+    @Override
+    public int compareTo(Book o) {
+
+        int res = author.compareTo(o.author);
+        if (res!=0) {
+            return res;
+        }
+
+        res = title.compareTo(o.title);
+        if (res!=0) {
+            return res;
+        }
+
+        if (year>o.year) {
+            return 1;
+        } else if (year<o.year) {
+            return -1;
+        } else {
+            return 0;
+        }
+
     }
 }

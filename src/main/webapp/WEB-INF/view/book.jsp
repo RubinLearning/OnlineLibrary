@@ -69,7 +69,9 @@
 
 </form:form>
 
-<p><a href="${addToFavoritesUrl}">Add to Favorites</a></p>
+<c:if test="${isFavorite==false}">
+	<p><a href="${addToFavoritesUrl}">Add to Favorites</a></p>
+</c:if>
 
 <c:if test="${contentAvailable==true}">
 	<p><a href="${downloadUrl}">Download</a></p>

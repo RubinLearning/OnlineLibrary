@@ -1,7 +1,7 @@
 package controller.property_editor;
 
 import domain.Genre;
-import service.GenreService;
+import service.interfaces.GenreService;
 
 import java.beans.PropertyEditorSupport;
 

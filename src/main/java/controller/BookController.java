@@ -4,17 +4,20 @@ import controller.property_editor.GenrePropertyEditor;
 import domain.Book;
 import domain.BookContent;
 import domain.Genre;
+import domain.User;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import service.BookService;
-import service.GenreService;
+import service.interfaces.BookService;
+import service.interfaces.GenreService;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,14 +31,22 @@ public class BookController {
 
     protected static Logger logger = Logger.getLogger("org/controller");
 
-    @Resource(name = "bookService")
+    @Value("${guest_name}")
+    private String guestName;
+
+    @Value("${buffer_size}")
+    private int bufferSize;
+
+    @Resource
+    @Autowired
     private BookService bookService;
 
-    @Resource(name = "genreService")
+    @Resource
+    @Autowired
     private GenreService genreService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public String getAll(@RequestParam(name = "gid", required = false) Long genreId, @RequestParam(name = "search", required = false) String searchString, Model model, Principal principal) {
+    public String getBookListPage(@RequestParam(name = "gid", required = false) Long genreId, @RequestParam(name = "search", required = false) String searchString, Model model, Principal principal) {
         logger.debug("Received request to show books page");
         List<Book> books;
         if (searchString != null) {
@@ -49,7 +60,7 @@ public class BookController {
         if (principal != null) {
             model.addAttribute("username", principal.getName());
         } else {
-            model.addAttribute("username", "Guest");
+            model.addAttribute("username", guestName);
         }
         model.addAttribute("books", books);
         model.addAttribute("booksQuantity", books.size());
@@ -58,7 +69,7 @@ public class BookController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.GET)
-    public String getAdd(Model model) {
+    public String getAddBookPage(Model model) {
         logger.debug("Received request to show add books page");
 
         Book book = new Book();
@@ -72,33 +83,24 @@ public class BookController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public String postAdd(@RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws IOException {
+    public String addBook(@RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws IOException {
         logger.debug("Received request to add new book");
-        bookService.add(book);
 
-        if (!file.isEmpty()) {
-            byte[] bytes = file.getBytes();
-            BookContent content = bookService.getContentByBookId(book.getId());
-            if (content == null) {
-                content = new BookContent();
-                content.setBook(book);
-            }
-            content.setContent(bytes);
-            bookService.updateContent(content);
-        }
+        bookService.add(book);
+        bookService.updateBookContent(book, file);
 
         return "redirect:list";
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String getDelete(@RequestParam("id") Long bookId) {
+    public String deleteBook(@RequestParam("id") Long bookId) {
         logger.debug("Received request to delete book");
         bookService.delete(bookId);
         return "redirect:list";
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.GET)
-    public String getEdit(@RequestParam("id") Long bookId, Model model) {
+    public String getEditBookPage(@RequestParam("id") Long bookId, Model model, Principal principal) {
         logger.debug("Received request to show edit book page");
 
         Book existingBook = bookService.get(bookId);
@@ -110,26 +112,21 @@ public class BookController {
         model.addAttribute("type", "edit");
         model.addAttribute("contentAvailable", (existingContent != null));
 
+        if (principal != null) {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            List<Book> userBooks = bookService.getFavoritesByUser(user);
+            model.addAttribute("isFavorite", userBooks.contains(existingBook));
+        }
+
         return "book";
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public String postEdit(@RequestParam("id") Long bookId, @RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws IOException {
+    public String updateBook(@RequestParam("id") Long bookId, @RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws IOException {
         logger.debug("Received request to add new book");
 
-        book.setId(bookId);
         bookService.edit(book);
-
-        if (!file.isEmpty()) {
-            byte[] bytes = file.getBytes();
-            BookContent content = bookService.getContentByBookId(bookId);
-            if (content == null) {
-                content = new BookContent();
-                content.setBook(book);
-            }
-            content.setContent(bytes);
-            bookService.updateContent(content);
-        }
+        bookService.updateBookContent(book, file);
 
         return "redirect:list";
     }
@@ -147,7 +144,7 @@ public class BookController {
 
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(content.getContent());
         OutputStream outputStream = response.getOutputStream();
-        byte[] buffer = new byte[4096];
+        byte[] buffer = new byte[bufferSize];
         int bytesRead = -1;
 
         while ((bytesRead = byteArrayInputStream.read(buffer)) != -1) {
