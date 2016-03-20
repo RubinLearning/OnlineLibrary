@@ -23,15 +23,17 @@
 
         <div class="section">Book</div>
 
-        <div class="menu">
-            <c:if test="${isFavorite==false}">
-                <p><a href="${addToFavoritesUrl}">Add to Favorites</a></p>
-            </c:if>
+        <c:if test="${type=='edit'}">
+            <div class="menu">
+                <c:if test="${isFavorite==false}">
+                    <p><a href="${addToFavoritesUrl}">Add to Favorites</a></p>
+                </c:if>
 
-            <p><a href="${downloadUrl}">Download</a></p>
-            <p><a href="${readUrl}">Read</a></p>
-            <p class="error">${param.contentError}</p>
-        </div>
+                <p><a href="${downloadUrl}">Download</a></p>
+                <p><a href="${readUrl}">Read</a></p>
+                <p class="error">${param.contentError}</p>
+            </div>
+        </c:if>
 
         <div class="form-elements">
             <form:label path="title">
@@ -77,15 +79,18 @@
                 </c:when>
             </c:choose>
         </div>
-        <div class="menu">
-            <c:if test="${isFavorite==false}">
-                <p><a href="${addToFavoritesUrl}">Add to Favorites</a></p>
-            </c:if>
 
-            <p><a href="${downloadUrl}">Download</a></p>
-            <p><a href="${readUrl}">Read</a></p>
-            <p class="error">${param.contentError}</p>
-        </div>
+        <c:if test="${type=='edit'}">
+            <div class="menu">
+                <c:if test="${isFavorite==false}">
+                    <p><a href="${addToFavoritesUrl}">Add to Favorites</a></p>
+                </c:if>
+
+                <p><a href="${downloadUrl}">Download</a></p>
+                <p><a href="${readUrl}">Read</a></p>
+                <p class="error">${param.contentError}</p>
+            </div>
+        </c:if>
 
         <div class="form-elements">
             <form:label path="title">

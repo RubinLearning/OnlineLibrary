@@ -17,7 +17,7 @@ import java.util.*;
 
 @Service
 @Transactional
-public class BookServiceHibernateImpl implements BookService{
+public class BookServiceHibernateImpl implements BookService {
 
     protected static Logger logger = Logger.getLogger("org/service");
 
@@ -43,7 +43,8 @@ public class BookServiceHibernateImpl implements BookService{
     public void addToFavorites(User user, Long bookId) {
         logger.debug("Adding book to favorites");
         Session session = sessionFactory.getCurrentSession();
-        Collection<Book> books = user.getBooks();
+        User existingUser = (User) session.get(User.class, user.getId());
+        List<Book> books = existingUser.getBooks();
         boolean alreadyIsFavorite = false;
         for (Book book : books) {
             if (book.getId() == bookId) {
@@ -53,7 +54,7 @@ public class BookServiceHibernateImpl implements BookService{
         }
         if (!alreadyIsFavorite) {
             books.add((Book) session.get(Book.class, bookId));
-            session.merge(user);
+            session.save(existingUser);
         }
     }
 
@@ -61,13 +62,14 @@ public class BookServiceHibernateImpl implements BookService{
     public void deleteFromFavorites(User user, Long bookId) {
         logger.debug("Deleting book from favorites");
         Session session = sessionFactory.getCurrentSession();
-        Iterator<Book> iterator = user.getBooks().iterator();
+        User existingUser = (User) session.get(User.class, user.getId());
+        Iterator<Book> iterator = existingUser.getBooks().iterator();
         while (iterator.hasNext()) {
             if (iterator.next().getId() == bookId) {
                 iterator.remove();
             }
         }
-        session.merge(user);
+        session.save(existingUser);
     }
 
     @Override
@@ -107,8 +109,21 @@ public class BookServiceHibernateImpl implements BookService{
     public void delete(Long id) {
         logger.debug("Deleting existing book");
         Session session = sessionFactory.getCurrentSession();
-        Book book = (Book) session.get(Book.class, id);
-        session.delete(book);
+
+        // if there is content for book - we should delete content (book will be deleted automatically)
+        // if there is no content - we simply delete the book
+        Query query = session.createQuery("SELECT bc FROM BookContent as bc WHERE bc.book.id = :bookId");
+        query.setParameter("bookId", id);
+        List contentAsList = query.list();
+        if (contentAsList.size() > 0) {
+            for (Object result : query.list()) {
+                BookContent content = (BookContent) result;
+                session.delete(content);
+            }
+        } else {
+            Book book = (Book) session.get(Book.class, id);
+            session.delete(book);
+        }
     }
 
     @Override

@@ -15,7 +15,8 @@ public class BookContent {
     @JoinColumn(name = "BOOK_ID")
     private Book book;
 
-    @Column(name = "CONTENT", length = 6000000)
+    // store books, only if their size less than about 10 Mb
+    @Column(name = "CONTENT", length = 10000000)
     @Lob
     private byte[] content;
 

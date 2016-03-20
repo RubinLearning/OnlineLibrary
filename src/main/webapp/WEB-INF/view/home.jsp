@@ -56,7 +56,7 @@
                     <td><c:out value="${book.author}"/></td>
                     <td><c:out value="${book.genre.name}"/></td>
                     <td><c:out value="${book.year}"/></td>
-                    <td class="button><a href="${deleteUrl}"><img src="${deleteImgUrl}"/></a></td>
+                    <td class="button"><a href="${deleteUrl}"><img src="${deleteImgUrl}"/></a></td>
                 </tr>
             </c:forEach>
             </tbody>
