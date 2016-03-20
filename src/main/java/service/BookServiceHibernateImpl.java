@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import service.interfaces.BookService;
+import utils.OnlineLibraryException;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class BookServiceHibernateImpl implements BookService{
     public void addToFavorites(User user, Long bookId) {
         logger.debug("Adding book to favorites");
         Session session = sessionFactory.getCurrentSession();
-        List<Book> books = user.getBooks();
+        Collection<Book> books = user.getBooks();
         boolean alreadyIsFavorite = false;
         for (Book book : books) {
             if (book.getId() == bookId) {
@@ -126,7 +127,7 @@ public class BookServiceHibernateImpl implements BookService{
     }
 
     @Override
-    public void updateBookContent(Book book, MultipartFile file) throws IOException {
+    public void updateBookContent(Book book, MultipartFile file) throws OnlineLibraryException {
         logger.debug("Updating content");
 
         if (file.isEmpty()) {
@@ -134,14 +135,18 @@ public class BookServiceHibernateImpl implements BookService{
         }
 
         Session session = sessionFactory.getCurrentSession();
-        byte[] bytes = file.getBytes();
-        BookContent content = getContentByBookId(book.getId());
-        if (content == null) {
-            content = new BookContent();
-            content.setBook(book);
+        try {
+            byte[] bytes = file.getBytes();
+            BookContent content = getContentByBookId(book.getId());
+            if (content == null) {
+                content = new BookContent();
+                content.setBook(book);
+            }
+            content.setContent(bytes);
+            session.merge(content);
+        } catch (IOException e) {
+            throw new OnlineLibraryException(e.getMessage());
         }
-        content.setContent(bytes);
-        session.merge(content);
     }
 
 }

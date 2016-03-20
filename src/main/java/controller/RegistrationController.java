@@ -34,7 +34,7 @@ public class RegistrationController {
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
-    public String registerUserAccount(@ModelAttribute("user") @Valid UserDTO accountDTO, BindingResult result) {
+    public String registerUserAccount(@ModelAttribute("user") @Valid UserDTO userDTO, BindingResult result) {
 
         logger.debug("Received request to register new user");
 
@@ -43,8 +43,8 @@ public class RegistrationController {
         }
 
         try {
-            userService.registerNewUser(accountDTO);
-            return "registration-success";
+            userService.registerNewUser(userDTO);
+            return "login";
         } catch (OnlineLibraryException e) {
             result.reject("username", e.getMessage());
             return "registration";

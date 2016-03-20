@@ -3,11 +3,11 @@ package service.interfaces;
 import domain.Genre;
 import utils.OnlineLibraryException;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface GenreService {
 
-    List<Genre> getAll();
+    Collection<Genre> getAll();
 
     Genre get(Long id);
     void add(Genre genre);

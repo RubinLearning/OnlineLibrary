@@ -55,14 +55,6 @@ public class UserServiceHibernateImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
-        logger.debug("Retrieving all users");
-        Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("FROM User");
-        return query.list();
-    }
-
-    @Override
     public User get(Long id) {
         Session session = sessionFactory.getCurrentSession();
         User user = (User) session.get(User.class, id);

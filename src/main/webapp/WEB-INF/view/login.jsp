@@ -2,12 +2,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
 <html>
 
 <head>
-    <link href="<c:url value="/resources/css/reset.css"/>" rel="stylesheet">
-    <link href="<c:url value="/resources/css/structure.css"/>" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link href='http://fonts.googleapis.com/css?family=Bitter' rel='stylesheet' type='text/css'>
+    <link href="<c:url value="/resources/css/main.css"/>" rel="stylesheet">
     <title>Login</title>
 </head>
 
@@ -15,20 +17,36 @@
 
     <c:url var="registrationUrl" value="/registration"/>
 
-    <form class="box login" action="login" method="POST">
-        <fieldset class="boxBody">
-            <label for="username">Username</label>
-            <input type="text" id="username" name = "username" placeholder="username" required/>
-            <label for="password">Password</label>
-            <input type="password" id="password" name = "password" placeholder="password" required/>
-        </fieldset>
-        <footer>
-            <label><input type="checkbox" name="_spring_security_remember_me">Remember me</label>
-            <input type="submit" class="btnLogin" value="Login"/>
-        </footer>
-        <footer>
-            <a href="${registrationUrl}">Register new user</a>
-        </footer>
+    <form class="desktop" action="login" method="POST">
+
+        <div class="section">Login</div>
+
+        <div class="menu"><a href="${registrationUrl}">Register new user</a></div>
+
+        <br>
+
+        <div class="form-elements">
+            <label>
+                Username
+                <input type="text" id="username" name="username" placeholder="username" value="${user.username}" required="true"/>
+            </label>
+            <label>
+                Password
+                <input type="password" id="password" name="password" placeholder="password" value="${user.password}" required="true"/>
+            </label>
+
+        </div>
+
+        <div class="button-section">
+            <span class="file">
+			<input type="checkbox" name="_spring_security_remember_me">Remember me
+            </span>
+            <input type="submit" value="Login">
+        </div>
+
+        <br/>
+        <br/>
+
     </form>
 
 </body>

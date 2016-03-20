@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import service.interfaces.BookService;
 import service.interfaces.GenreService;
+import utils.OnlineLibraryErrorType;
+import utils.OnlineLibraryException;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
 
 @Controller
@@ -46,7 +49,7 @@ public class BookController {
     private GenreService genreService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public String getBookListPage(@RequestParam(name = "gid", required = false) Long genreId, @RequestParam(name = "search", required = false) String searchString, Model model, Principal principal) {
+    public String getLibraryPage(@RequestParam(name = "gid", required = false) Long genreId, @RequestParam(name = "search", required = false) String searchString, Model model, Principal principal) {
         logger.debug("Received request to show books page");
         List<Book> books;
         if (searchString != null) {
@@ -56,7 +59,7 @@ public class BookController {
         } else {
             books = bookService.getAll();
         }
-        List<Genre> genres = genreService.getAll();
+        Collection<Genre> genres = genreService.getAll();
         if (principal != null) {
             model.addAttribute("username", principal.getName());
         } else {
@@ -65,7 +68,7 @@ public class BookController {
         model.addAttribute("books", books);
         model.addAttribute("booksQuantity", books.size());
         model.addAttribute("genres", genres);
-        return "book-list";
+        return "library";
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.GET)
@@ -73,7 +76,7 @@ public class BookController {
         logger.debug("Received request to show add books page");
 
         Book book = new Book();
-        List<Genre> genres = genreService.getAll();
+        Collection<Genre> genres = genreService.getAll();
 
         model.addAttribute("book", book);
         model.addAttribute("genres", genres);
@@ -83,7 +86,7 @@ public class BookController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public String addBook(@RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws IOException {
+    public String addBook(@RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws OnlineLibraryException {
         logger.debug("Received request to add new book");
 
         bookService.add(book);
@@ -104,13 +107,11 @@ public class BookController {
         logger.debug("Received request to show edit book page");
 
         Book existingBook = bookService.get(bookId);
-        BookContent existingContent = bookService.getContentByBookId(bookId);
-        List<Genre> genres = genreService.getAll();
+        Collection<Genre> genres = genreService.getAll();
 
         model.addAttribute("book", existingBook);
         model.addAttribute("genres", genres);
         model.addAttribute("type", "edit");
-        model.addAttribute("contentAvailable", (existingContent != null));
 
         if (principal != null) {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -122,7 +123,7 @@ public class BookController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public String updateBook(@RequestParam("id") Long bookId, @RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws IOException {
+    public String updateBook(@RequestParam("id") Long bookId, @RequestParam("file") MultipartFile file, @ModelAttribute("book") Book book) throws OnlineLibraryException {
         logger.debug("Received request to add new book");
 
         bookService.edit(book);
@@ -133,26 +134,43 @@ public class BookController {
 
     // pass type = "read" if we only need to read book, not to download
     @RequestMapping(value = "/content/{type}", method = RequestMethod.GET)
-    public void readBook(@PathVariable("type") String type, @RequestParam("id") Long bookId, HttpServletResponse response) throws IOException {
+    public String readBook(@PathVariable("type") String type, @RequestParam("id") Long bookId, HttpServletResponse response, Model model) throws OnlineLibraryException {
 
         String filename = "book_" + bookService.get(bookId).getId().toString() + ".pdf";
         BookContent content = bookService.getContentByBookId(bookId);
+
+        if (content == null) {
+            model.addAttribute("contentError", OnlineLibraryErrorType.LACK_OF_CONTENT.getName());
+            return "redirect:/book/edit?id=" + bookId;
+        }
+
         response.setContentType("application/pdf");
         response.setContentLength(content.getContent().length);
         String contentDispositionType = type.equals("read") ? "inline" : "attachment";
         response.setHeader("Content-Disposition", String.format(contentDispositionType + "; filename=\"" + filename + "\""));
 
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(content.getContent());
-        OutputStream outputStream = response.getOutputStream();
-        byte[] buffer = new byte[bufferSize];
-        int bytesRead = -1;
+        try (
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(content.getContent());
+                OutputStream outputStream = response.getOutputStream();
+        ) {
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead = -1;
 
-        while ((bytesRead = byteArrayInputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
+            while ((bytesRead = byteArrayInputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            throw new OnlineLibraryException(e.getMessage());
         }
 
-        byteArrayInputStream.close();
-        outputStream.close();
+        return null;
+    }
+
+    @RequestMapping(value = "/check", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    boolean checkContent() {
+        return false;
     }
 
     @InitBinder

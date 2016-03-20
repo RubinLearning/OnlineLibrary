@@ -22,7 +22,7 @@
                 login-page="/login"
                 login-processing-url="/login"
                 default-target-url="/"
-                always-use-default-target = "true"
+                always-use-default-target = "false"
                 authentication-failure-url="/login?error=true"
                 username-parameter="username"
                 password-parameter="password"/>

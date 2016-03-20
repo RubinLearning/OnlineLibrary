@@ -4,8 +4,10 @@ import domain.Book;
 import domain.BookContent;
 import domain.User;
 import org.springframework.web.multipart.MultipartFile;
+import utils.OnlineLibraryException;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 public interface BookService {
@@ -24,6 +26,6 @@ public interface BookService {
     void delete(Long id);
 
     BookContent getContentByBookId(Long bookId);
-    void updateBookContent(Book book, MultipartFile file) throws IOException;
+    void updateBookContent(Book book, MultipartFile file) throws OnlineLibraryException;
 
 }

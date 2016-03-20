@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import service.interfaces.GenreService;
@@ -12,30 +13,29 @@ import utils.OnlineLibraryErrorType;
 import utils.OnlineLibraryException;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
-public class GenreServiceHibernateImpl implements GenreService{
+public class GenreServiceHibernateImpl implements GenreService, InitializingBean{
 
     protected static Logger logger = Logger.getLogger("org/service");
+
+    // store genre list to avoid getting it from database for each request
+    private Map<Long, Genre> allGenres;
 
     @Resource
     private SessionFactory sessionFactory;
 
     @Override
-    public List<Genre> getAll() {
-        logger.debug("Retrieving all categories");
-        Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("FROM Genre ORDER BY name");
-        return query.list();
+    public Collection<Genre> getAll() {
+        logger.debug("Retrieving all genres");
+        return allGenres.values();
     }
 
     @Override
     public Genre get(Long id) {
-        Session session = sessionFactory.getCurrentSession();
-        Genre genre = (Genre) session.get(Genre.class, id);
-        return genre;
+        return allGenres.get(id);
     }
 
     @Override
@@ -69,4 +69,19 @@ public class GenreServiceHibernateImpl implements GenreService{
         session.save(existingGenre);
     }
 
+    private Map<Long, Genre> cacheGenres() {
+        Session session = sessionFactory.openSession();
+        Query query = session.createQuery("FROM Genre ORDER BY name");
+        Map<Long, Genre> genresCache = new LinkedHashMap<>();
+        for (Object genre: query.list()){
+            genresCache.put(((Genre)genre).getId(), (Genre) genre);
+        }
+        session.close();
+        return genresCache;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        allGenres = cacheGenres();
+    }
 }
